@@ -23,7 +23,7 @@ public class DOSPluginUtilUnitTest {
     @Test
     public void testHostList() {
         String uri = "dos://dos-dss.ucsc-cgp-dev.org/fff5a29f-d184-4e3b-9c5b-6f44aea7f527?version=2018-02-28T033124.129027Zf";
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("dos");
         split.add("dos-dss.ucsc-cgp-dev.org");
         split.add("fff5a29f-d184-4e3b-9c5b-6f44aea7f527?version=2018-02-28T033124.129027Zf");
@@ -51,7 +51,7 @@ public class DOSPluginUtilUnitTest {
     @Test
     public void testGrabJSONHttpStatusNot200() throws IOException {
         DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("fake-scheme");
         split.add("fake-host");
         split.add("fake-uid");
@@ -68,7 +68,7 @@ public class DOSPluginUtilUnitTest {
     @Test
     public void testGrabJSONHttpsStatusNot200() throws IOException {
         DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("fake-scheme");
         split.add("fake-host");
         split.add("fake-uid");
@@ -86,7 +86,7 @@ public class DOSPluginUtilUnitTest {
 
     @Test
     public void testGrabJSONBadURI() {
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("fake-scheme");
         split.add("fake-host");
         split.add("fake-uid");
@@ -95,14 +95,14 @@ public class DOSPluginUtilUnitTest {
 
     @Test
     public void testGrabJSONBadParameter() {
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("fake");
         Assert.assertNull(pluginUtil.grabJSON(split));
     }
 
     @Test
     public void testGrabJSONElements() {
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("fake-scheme");
         split.add("fake-host");
         split.add("fake-uid");
@@ -113,7 +113,7 @@ public class DOSPluginUtilUnitTest {
 
     @Test
     public void testCreateConnection() throws IOException {
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("dos");
         split.add("ec2-52-26-45-130.us-west-2.compute.amazonaws.com:8080");
         split.add("911bda59-b6f9-4330-9543-c2bf96df1eca");
@@ -125,7 +125,7 @@ public class DOSPluginUtilUnitTest {
 
     @Test
     public void testCreateConnectionReturnNull() {
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("fake-scheme");
         split.add("fake-host");
         split.add("fake-uid");
@@ -135,7 +135,7 @@ public class DOSPluginUtilUnitTest {
 
     @Test
     public void testReadResponse() throws IOException {
-        ArrayList<String> split = new ArrayList<>();
+        List<String> split = new ArrayList<>();
         split.add("dos");
         split.add("ec2-52-26-45-130.us-west-2.compute.amazonaws.com:8080");
         split.add("911bda59-b6f9-4330-9543-c2bf96df1eca");

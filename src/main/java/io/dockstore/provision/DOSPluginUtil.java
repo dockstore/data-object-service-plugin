@@ -32,7 +32,7 @@ class DOSPluginUtil {
      * Gets the plugins json file path from the config file, otherwise defaults.
      *
      * @param dosURI The string targetPath
-     * @return The targetPath split into an ArrayList object. Return an empty ArrayList object otherwise
+     * @return The targetPath split into an ArrayList object. Return an empty List object otherwise
      */
     List<String> splitUri(String dosURI) {
         if (Pattern.compile(":\\/\\/(.+)/").matcher(dosURI).find()){
@@ -44,8 +44,8 @@ class DOSPluginUtil {
     /**
      * Gets the json response from host using HTTP GET method
      *
-     * @param uriList The targetPath split into an ArrayList object with the following format: [scheme, host, uid]
-     * @return The JSONObject containing the content of the json response. Null, otherwise
+     * @param uriList The targetPath split into a List object with the following format: [scheme, host, uid]
+     * @return The JSONObject containing the content of the JSON response. Null, otherwise
      */
     JSONObject grabJSON(List<String> uriList){
         String content;
