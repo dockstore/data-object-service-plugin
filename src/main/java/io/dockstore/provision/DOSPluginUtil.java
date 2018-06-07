@@ -38,7 +38,7 @@ class DOSPluginUtil {
     Optional<ImmutableTriple<String, String, String>> splitUri(String dosURI) {
         if (Pattern.compile(":\\/\\/(.+)/").matcher(dosURI).find()){
             List<String> split  = Lists.newArrayList(dosURI.split(":\\/\\/|/"));
-            return Optional.ofNullable(new ImmutableTriple<>(split.get(SCHEME), split.get(HOST), split.get(PATH)));
+            return Optional.of(new ImmutableTriple<>(split.get(SCHEME), split.get(HOST), split.get(PATH)));
         }
         return Optional.empty();
     }

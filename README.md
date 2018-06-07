@@ -2,11 +2,15 @@
 [![Coverage Status](https://coveralls.io/repos/github/dockstore/data-object-service-plugin/badge.svg?branch=master)](https://coveralls.io/github/dockstore/data-object-service-plugin?branch=master)
 
 # data-object-service-plugin
-Dockstore Data Object Service file preprovisioning plugin
+[Dockstore Data Object Service](https://github.com/ga4gh/data-object-service-schemas) file preprovisioning plugin
 
 ## Usage
 
-The Data Object Service plugin is capable of calling other Dockstore plugins (i.e. syn, s3, icgc, etc.) to download, upload, and set metadata on uploaded objects.
+The Data Object Service plugin fetches data objects from a provided DOS URI in order to download one of the returned URLs.
+
+For example, if the data object for a given DOS URI references s3 and gcs URIs, the URL for the s3 data object is passed into the s3 plugin for downloading, because a gcs file plugin for Dockstore does not currently exist.
+
+The plugin only supports downloads. Support for uploads will be added later.
 
 ```
 $ cat test.dos.json
@@ -34,24 +38,4 @@ Provisioning your output files to their final destinations
 Registering: #output_file to provision from ./dockstore/dockstore-tool-md5sum-master/datastore/launcher-2c670320-9ade-4f9d-9e54-3eff66c29e8d/outputs/md5sum.txt to : /tmp/md5sum.txt
 Provisioning from ./datastore/launcher-2c670320-9ade-4f9d-9e54-3eff66c29e8d/outputs/md5sum.txt to /tmp/md5sum.txt
 Downloading: file:///./datastore/launcher-2c670320-9ade-4f9d-9e54-3eff66c29e8d/outputs/md5sum.txt to file:///tmp/md5sum.txt
-```
-
-## Configuration
-
-Download the plugin with `dockstore plugin download` by adding an entry to ~/.dockstore/plugins.json similar to the following
-```
-[
-  {
-    "name": "dockstore-file-dos-plugin",
-    "version": "0.0.1"
-  },
-  {
-    "name": "dockstore-file-s3-plugin",
-    "version": "0.0.3"
-  },
-  {
-    "name": "dockstore-file-synapse-plugin",
-    "version": "0.0.5"
-  }
-]
 ```
