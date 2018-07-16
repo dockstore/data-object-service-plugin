@@ -107,7 +107,6 @@ public class DOSPluginUtilUnitTest {
     public void testReadResponse() throws IOException {
         ImmutableTriple<String, String, String> split =
                 new ImmutableTriple<>("dos", "dataguids.org", "dg.4503/630d31c3-381e-488d-b639-ce5d047a0142");
-        System.out.println("testReadResponse: createConnection for: " + split.getLeft() + split.getMiddle() + split.getRight());
         HttpURLConnection actualConn = pluginUtil.createConnection("https", split);
         InputStream expectedResponse = IOUtils.toInputStream(
         "{" +
@@ -137,21 +136,6 @@ public class DOSPluginUtilUnitTest {
                 "}" +
         "}");
 
-//        InputStream expectedResponse = IOUtils.toInputStream("{  \"data_object\": {    \"aliases\": [      " +
-//                "\"phase3\",      \"data\",      \"HG03237\",      \"cg_data\",      \"ASM_blood\",      \"REPORTS\"," +
-//                "      \"substitutionLengthCoding-GS000017140-ASM.tsv\",      " +
-//                "\"phase3/data/HG03237/cg_data/ASM_blood/REPORTS/substitutionLengthCoding-GS000017140-ASM.tsv\"    ]," +
-//                "    \"checksums\": [      {        \"checksum\": \"ff7d7ec9a803e09ffab681165a9b7c36\",        " +
-//                "\"type\": \"md5\"      }    ],    \"created\": \"2015-05-21T23:09:20+00:00\",    \"current\": true, " +
-//                "   \"id\": \"911bda59-b6f9-4330-9543-c2bf96df1eca\",    \"size\": \"491\",    \"updated\": " +
-//                "\"2015-05-21T23:09:20+00:00\",    \"urls\": [      {        \"system_metadata\": {          " +
-//                "\"StorageClass\": \"STANDARD\",          \"bucket_name\": \"1000genomes\",          \"event_type\": " +
-//                "\"ObjectCreated:Put\"        },        \"url\": " +
-//                "\"s3://1000genomes/phase3/data/HG03237/cg_data/ASM_blood/REPORTS/substitutionLengthCoding" +
-//                "-GS000017140-ASM.tsv\",        \"user_metadata\": {          \"s3cmd-attrs\": " +
-//                "\"uid:5343/gname:sysadmin/uname:meslerd/gid:14/mode:33188/mtime:1432249758/atime:1432249758/md5" +
-//                ":ff7d7ec9a803e09ffab681165a9b7c36/ctime:1432249758\"        }      }    ],    \"version\": " +
-//                "\"2018-05-01T05:44:57.781598Z\"  }}", "UTF-8");
         HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
         Mockito.when(mockConn.getInputStream()).thenReturn(expectedResponse);
         BufferedReader bufferedReader = Mockito.spy(new BufferedReader(new InputStreamReader(mockConn.getInputStream ())));
