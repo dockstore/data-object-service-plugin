@@ -37,8 +37,9 @@ public class DOSPluginUnitTest {
     public void testPrepareDownload() {
         DOSPlugin.DOSPreProvision dos = new DOSPlugin.DOSPreProvision();
         List<String> expected = new ArrayList<>();
-        String targetPath = "dos://ec2-52-26-45-130.us-west-2.compute.amazonaws.com:8080/911bda59-b6f9-4330-9543-c2bf96df1eca";
-        expected.add("s3://1000genomes/phase3/data/HG03237/cg_data/ASM_blood/REPORTS/substitutionLengthCoding-GS000017140-ASM.tsv");
+        String targetPath = "dos://dos-dss.ucsc-cgp-dev.org/630d31c3-381e-488d-b639-ce5d047a0142?version=2018-05-26T134315.070662Z";
+        expected.add("s3://cgp-commons-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
+        expected.add("gs://cgp-commons-multi-region-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
         Assert.assertEquals(expected, dos.prepareDownload(targetPath));
     }
 
@@ -52,7 +53,26 @@ public class DOSPluginUnitTest {
 
 
     @Test
+    public void testPrepareDownload2() {
+        DOSPlugin.DOSPreProvision dos = new DOSPlugin.DOSPreProvision();
+        List<String> expected = new ArrayList<>();
+        String targetPath = "dos://dg.4503/630d31c3-381e-488d-b639-ce5d047a0142";
+        expected.add("gs://cgp-commons-multi-region-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
+        expected.add("s3://cgp-commons-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
+        Assert.assertEquals(expected, dos.prepareDownload(targetPath));
+    }
+
+
+    @Test
     public void testPrepareDownloadReturnEmpty2() {
+        DOSPlugin.DOSPreProvision dos = new DOSPlugin.DOSPreProvision();
+        String targetPath = "dos://dg.4503/630d31c3-381e-488d-b639-ffffffffffff";
+        Assert.assertTrue(dos.prepareDownload(targetPath).isEmpty());
+    }
+
+
+    @Test
+    public void testPrepareDownloadReturnEmpty3() {
         DOSPlugin.DOSPreProvision dos = new DOSPlugin.DOSPreProvision();
         String targetPath = "fake";
         Assert.assertTrue(dos.prepareDownload(targetPath).isEmpty());
@@ -60,7 +80,7 @@ public class DOSPluginUnitTest {
 
 
     @Test
-    public void testPrepareDownloadReturnEmpty3() {
+    public void testPrepareDownloadReturnEmpty4() {
         DOSPlugin.DOSPreProvision dos = new DOSPlugin.DOSPreProvision();
         String targetPath = "dos:/fake";
         Assert.assertTrue(dos.prepareDownload(targetPath).isEmpty());
