@@ -28,6 +28,8 @@ class DOSPluginUtil {
     private static final int PATH = 2;
 
     private static final String DG_HOST = "dataguids.org";
+    private static final int DG_PREFIX = 1;
+    private static final int DG_UUID = 2;
 
     // Package-private constructor
     DOSPluginUtil() {
@@ -40,19 +42,15 @@ class DOSPluginUtil {
      * @return the scheme, host, and path of the targetPath, or <code>Optional.empty()</code>
      */
     Optional<ImmutableTriple<String, String, String>> splitUri(String dosURI) {
-        System.out.println("splitUri: Parsing URI " + dosURI);
         if (Pattern.compile(":\\/\\/(.+)/").matcher(dosURI).find()){
             List<String> split  = Lists.newArrayList(dosURI.split(":\\/\\/|/"));
 
             // Find out if the path is of the DOS GUID format
             // dos://dg.4503/6f9ad7df-3751-4056-9340-aa9448525b54
-            System.out.println("splitUri: splitting DOS URI " + dosURI + " Host is " + split.get(HOST));
             // See if the Host portion starts with 'dg' and ends with a port number
             List<String> host_split = Lists.newArrayList(split.get(HOST).split("\\.", 2));
             if (host_split.size() > 1 && host_split.get(0).equals("dg") && NumberUtils.isNumber(host_split.get(1))) {
-                 System.out.println("splitUri: Format is dg.<port> format URI; use " + DG_HOST + " for server");
-                // Construct a URL of the form: https://dataguids.org/ga4gh/dos/v1/dataobjects/dg.4503/6f9ad7df-3751-4056-9340-aa9448525b54
-                return Optional.of(new ImmutableTriple<>(split.get(SCHEME), DG_HOST, split.get(HOST) + "/" + split.get(PATH)));
+                return Optional.of(new ImmutableTriple<>(split.get(SCHEME), DG_HOST, split.get(DG_PREFIX) + "/" + split.get(DG_UUID)));
             }
             return Optional.of(new ImmutableTriple<>(split.get(SCHEME), split.get(HOST), split.get(PATH)));
         }
@@ -98,7 +96,7 @@ class DOSPluginUtil {
             System.out.println("Opening HTTP URL Connection:" + protocol + "://" + immutableTriple.getMiddle() + API +  immutableTriple.getRight());
             return (HttpURLConnection) request.openConnection();
         } catch ( IOException e) {
-            System.err.println("ERROR opening HTTP URL Connection.");
+            System.err.println("ERROR opening HTTP URL Connection:" + protocol + "://" + immutableTriple.getMiddle() + API +  immutableTriple.getRight());
             e.printStackTrace();
         }
         return null;

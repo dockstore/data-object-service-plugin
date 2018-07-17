@@ -107,6 +107,8 @@ public class DOSPluginUtilUnitTest {
     public void testReadResponse() throws IOException {
         ImmutableTriple<String, String, String> split =
                 new ImmutableTriple<>("dos", "dataguids.org", "dg.4503/630d31c3-381e-488d-b639-ce5d047a0142");
+        // Construct URL https://dataguids.org/ga4gh/dos/v1/dataobjects/dg.4503/630d31c3-381e-488d-b639-ce5d047a0142
+        // This is a live URL and this test and others rely on it
         HttpURLConnection actualConn = pluginUtil.createConnection("https", split);
         InputStream expectedResponse = IOUtils.toInputStream(
         "{" +
