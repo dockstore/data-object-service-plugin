@@ -93,7 +93,6 @@ class DOSPluginUtil {
     HttpURLConnection createConnection(String protocol, ImmutableTriple<String, String, String> immutableTriple) {
         try {
             URL request = new URL(protocol + "://" + immutableTriple.getMiddle() + API +  immutableTriple.getRight());
-            System.out.println("Opening HTTP URL Connection:" + protocol + "://" + immutableTriple.getMiddle() + API +  immutableTriple.getRight());
             return (HttpURLConnection) request.openConnection();
         } catch ( IOException e) {
             System.err.println("ERROR opening HTTP URL Connection:" + protocol + "://" + immutableTriple.getMiddle() + API +  immutableTriple.getRight());
