@@ -44,9 +44,10 @@ class DOSPluginUtil {
     Optional<ImmutableTriple<String, String, String>> splitUri(String dosURI) {
         if (Pattern.compile(":\\/\\/(.+)/").matcher(dosURI).find()){
             List<String> split  = Lists.newArrayList(dosURI.split(":\\/\\/|/"));
-
-            // Find out if the path is of the DOS GUID format
-            // dos://dg.4503/6f9ad7df-3751-4056-9340-aa9448525b54
+            // Find out if the path is of the DOS GUID old format
+            // dos://dos-dss.ucsc-cgp-dev.org/630d31c3-381e-488d-b639-ce5d047a0142?version=2018-05-26T134315.070662Z
+            // or the new format
+            // dos://dg.4503/630d31c3-381e-488d-b639-ce5d047a0142
             // See if the Host portion starts with 'dg' and ends with a port number
             List<String> host_split = Lists.newArrayList(split.get(HOST).split("\\.", 2));
             if (host_split.size() > 1 && host_split.get(0).equals("dg") && NumberUtils.isNumber(host_split.get(1))) {
