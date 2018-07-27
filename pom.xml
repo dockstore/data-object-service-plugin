@@ -16,6 +16,7 @@
         <plugin.id>${project.artifactId}</plugin.id>
         <plugin.class>io.dockstore.provision.DOSPlugin</plugin.class>
         <plugin.version>${project.version}</plugin.version>
+        <plugin.requires>&gt;0.0.0</plugin.requires> <!-- 0.0.1 is Dockstore 1.5, which has PreProvisionInterface-->
         <plugin.provider>Ryan Bautista</plugin.provider>
         <plugin.dependencies/>
     </properties>
@@ -101,6 +102,7 @@
                             <Plugin-Version>${plugin.version}</Plugin-Version>
                             <Plugin-Provider>${plugin.provider}</Plugin-Provider>
                             <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>
+                            <Plugin-Requires>${plugin.requires}</Plugin-Requires>
                         </manifestEntries>
                     </archive>
                 </configuration>
