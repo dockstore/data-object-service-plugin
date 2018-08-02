@@ -6,7 +6,7 @@
     <artifactId>dockstore-file-dos-plugin</artifactId>
     <packaging>jar</packaging>
     <name>dockstore-file-dos-plugin</name>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
 
 
     <properties>
