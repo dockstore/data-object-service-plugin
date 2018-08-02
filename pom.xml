@@ -8,7 +8,7 @@
     <artifactId>dockstore-file-dos-plugin</artifactId>
     <packaging>jar</packaging>
     <name>dockstore-file-dos-plugin</name>
-    <version>0.0.1</version>
+    <version>0.0.1-SNAPSHOT</version>
 
 
     <properties>
@@ -16,9 +16,18 @@
         <plugin.id>${project.artifactId}</plugin.id>
         <plugin.class>io.dockstore.provision.DOSPlugin</plugin.class>
         <plugin.version>${project.version}</plugin.version>
+        <plugin.requires>&gt;0.0.0</plugin.requires> <!-- 0.0.1 is Dockstore 1.5, which has PreProvisionInterface-->
         <plugin.provider>Ryan Bautista</plugin.provider>
+        <github.url>scm:git:git@github.com:dockstore/data-object-service-plugin.git</github.url>
         <plugin.dependencies/>
     </properties>
+
+    <scm>
+        <connection>${github.url}</connection>
+        <developerConnection>${github.url}</developerConnection>
+        <url>${github.url}</url>
+        <tag>0.0.1</tag>
+    </scm>
 
     <repositories>
         <repository>
@@ -101,6 +110,7 @@
                             <Plugin-Version>${plugin.version}</Plugin-Version>
                             <Plugin-Provider>${plugin.provider}</Plugin-Provider>
                             <Plugin-Dependencies>${plugin.dependencies}</Plugin-Dependencies>
+                            <Plugin-Requires>${plugin.requires}</Plugin-Requires>
                         </manifestEntries>
                     </archive>
                 </configuration>
