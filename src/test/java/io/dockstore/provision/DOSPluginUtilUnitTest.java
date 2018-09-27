@@ -88,10 +88,11 @@ public class DOSPluginUtilUnitTest {
     @Test
     public void testCreateConnection() throws IOException {
         ImmutableTriple<String, String, String> split =
-                new ImmutableTriple<>("dos", "ec2-52-26-45-130.us-west-2.compute.amazonaws.com:8080", "911bda59-b6f9-4330-9543-c2bf96df1eca");
+                new ImmutableTriple<>("dos", "dos-dss.ucsc-cgp-dev.org", "630d31c3-381e-488d-b639-ce5d047a0142?version=2018-05-26T134315.070662Z");
 
         URL mockURL = new URL("http://" + split.getMiddle() + "/ga4gh/dos/v1/dataobjects/" + split.getRight());
         HttpURLConnection mockConn = (HttpURLConnection) mockURL.openConnection();
+        System.out.print(mockConn.toString());
         Assert.assertThat(mockConn.toString(), CoreMatchers.containsString(pluginUtil.createConnection("http", split).toString()));
     }
 

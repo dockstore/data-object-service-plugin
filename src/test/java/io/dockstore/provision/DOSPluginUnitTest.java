@@ -37,29 +37,17 @@ public class DOSPluginUnitTest {
     public void testPrepareDownload() {
         DOSPlugin.DOSPreProvision dos = new DOSPlugin.DOSPreProvision();
         List<String> expected = new ArrayList<>();
-        String targetPath = "dos://dos-dss.ucsc-cgp-dev.org/630d31c3-381e-488d-b639-ce5d047a0142?version=2018-05-26T134315.070662Z";
-        expected.add("s3://cgp-commons-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
+        String targetPath = "dos://dg.4503/630d31c3-381e-488d-b639-ce5d047a0142";
         expected.add("gs://cgp-commons-multi-region-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
+        expected.add("s3://cgp-commons-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
         Assert.assertEquals(expected, dos.prepareDownload(targetPath));
     }
-
 
     @Test
     public void testPrepareDownloadReturnEmpty1() {
         DOSPlugin.DOSPreProvision dos = new DOSPlugin.DOSPreProvision();
         String targetPath = "dos://dos-dss.ucsc-cgp-dev.org/fff5a29f-d184-4e3b-9c5b-6f44aea7f527?version=2018-02-28T033124.129027Zf";
         Assert.assertTrue(dos.prepareDownload(targetPath).isEmpty());
-    }
-
-
-    @Test
-    public void testPrepareDownload2() {
-        DOSPlugin.DOSPreProvision dos = new DOSPlugin.DOSPreProvision();
-        List<String> expected = new ArrayList<>();
-        String targetPath = "dos://dg.4503/630d31c3-381e-488d-b639-ce5d047a0142";
-        expected.add("gs://cgp-commons-multi-region-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
-        expected.add("s3://cgp-commons-public/topmed_open_access/44a8837b-4456-5709-b56b-54e23000f13a/NWD100953.recab.cram.crai");
-        Assert.assertEquals(expected, dos.prepareDownload(targetPath));
     }
 
 
