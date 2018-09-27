@@ -55,7 +55,7 @@ public class DOSPlugin extends Plugin {
 
         public List<String> prepareDownload(String targetPath) {
             DOSPluginUtil pluginUtil = new DOSPluginUtil();
-            List<String> url_list = new ArrayList<>();
+            List<String> urlList = new ArrayList<>();
             Optional<ImmutableTriple<String, String, String>> uri = pluginUtil.splitUri(targetPath);
 
             if (uri.isPresent() && schemesHandled().contains(uri.get().getLeft())) {
@@ -64,11 +64,11 @@ public class DOSPlugin extends Plugin {
                 if(jsonObj.isPresent()) {
                     JSONArray urls = jsonObj.get().getJSONObject("data_object").getJSONArray("urls");
                     for (int i = 0; i < urls.length(); i++) {
-                        url_list.add(urls.getJSONObject(i).getString("url"));
+                        urlList.add(urls.getJSONObject(i).getString("url"));
                     }
                 }
             }
-            return url_list;
+            return urlList;
         }
     }
 }
