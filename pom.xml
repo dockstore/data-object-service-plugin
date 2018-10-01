@@ -6,7 +6,7 @@
     <artifactId>dockstore-file-dos-plugin</artifactId>
     <packaging>jar</packaging>
     <name>dockstore-file-dos-plugin</name>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
 
 
     <properties>
@@ -192,7 +192,7 @@
         <dependency>
             <groupId>io.dockstore</groupId>
             <artifactId>dockstore-file-plugin-parent</artifactId>
-            <version>1.5.0-alpha.2</version>
+            <version>1.5.1</version>
             <!-- !!! VERY IMPORTANT -->
             <!-- Version number should be changed to current version of dockstore-->
             <scope>provided</scope>

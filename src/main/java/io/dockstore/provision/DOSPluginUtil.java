@@ -31,6 +31,8 @@ class DOSPluginUtil {
     private static final int DG_PREFIX = 1;
     private static final int DG_UUID = 2;
 
+    private HttpURLConnection conn;
+
     // Package-private constructor
     DOSPluginUtil() {
     }
@@ -41,7 +43,7 @@ class DOSPluginUtil {
      * @param dosURI The string targetPath
      * @return the scheme, host, and path of the targetPath, or <code>Optional.empty()</code>
      */
-    Optional<ImmutableTriple<String, String, String>> splitUri(String dosURI) {
+    Optional<ImmutableTriple<String, String, String>> splitURI(String dosURI) {
         if (Pattern.compile(":\\/\\/(.+)/").matcher(dosURI).find()){
             List<String> split  = Lists.newArrayList(dosURI.split(":\\/\\/|/"));
             // Find out if the path is of the DOS GUID old format
@@ -64,31 +66,42 @@ class DOSPluginUtil {
      * @param immutableTriple The targetPath as an ImmutableTriple of <scheme, host, path>
      * @return The JSONObject containing the content of the JSON response, or <code>Optional.empty()</code>
      */
-    Optional<JSONObject> grabJSON(ImmutableTriple<String, String, String> immutableTriple){
+    Optional<JSONObject> getResponse(ImmutableTriple<String, String, String> immutableTriple){
         String content;
-        HttpURLConnection conn = null;
+        Optional<InputStream> JSONResponse;
 
         try {
-            conn = createConnection("http", immutableTriple);
-            if (Objects.requireNonNull(conn).getResponseCode() != HTTP_OK) {
-                try {
-                    conn = createConnection("https", immutableTriple);
-                    if (Objects.requireNonNull(conn).getResponseCode() != HTTP_OK) { return Optional.empty(); }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return Optional.empty();
-                }
-            }
-            content = readResponse(conn.getInputStream());
+            JSONResponse = downloadJSON(immutableTriple);
+            content = JSONResponse.map(this::readContent).orElse(null);
+
             return Optional.of(new JSONObject(content));
         } catch (Exception e) {
             System.err.println("Plugin HttpURLConnection error: "  + e.getCause());
             e.printStackTrace();
         } finally {
-            assert conn != null;
-            conn.disconnect();
+            disconnect();
         }
         return Optional.empty();
+    }
+
+    Optional<InputStream> downloadJSON(ImmutableTriple<String, String, String> immutableTriple) {
+        try {
+            conn = createConnection("http", immutableTriple);
+            if (Objects.requireNonNull(conn).getResponseCode() != HTTP_OK) {
+                try {
+                    conn = createConnection("https", immutableTriple);
+                    if (Objects.requireNonNull(conn).getResponseCode() != HTTP_OK) {
+                        return Optional.empty();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    return Optional.empty();
+                }
+            }
+            return Optional.ofNullable(conn.getInputStream());
+        } catch (IOException e) {
+            return Optional.empty();
+        }
     }
 
     HttpURLConnection createConnection(String protocol, ImmutableTriple<String, String, String> immutableTriple) {
@@ -102,7 +115,7 @@ class DOSPluginUtil {
         return null;
     }
 
-    String readResponse(InputStream stream) {
+    String readContent(InputStream stream) {
         try (BufferedReader in = new BufferedReader(new InputStreamReader(stream))){
             String line;
             StringBuilder content = new StringBuilder();
@@ -115,5 +128,10 @@ class DOSPluginUtil {
             e.printStackTrace();
         }
         return null;
+    }
+
+    void disconnect() {
+        assert conn != null;
+        conn.disconnect();
     }
 }
