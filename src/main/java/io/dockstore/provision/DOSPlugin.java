@@ -49,18 +49,19 @@ public class DOSPlugin extends Plugin {
     @Extension
     public static class DOSPreProvision implements PreProvisionInterface {
 
-        DOSPluginUtil pluginUtil = new DOSPluginUtil();
+        static final DOSPluginUtil DOS_PLUGIN_UTIL = new DOSPluginUtil();
+        static final Set<String> SCHEME = new HashSet<>(Lists.newArrayList("dos"));
 
         public Set<String> schemesHandled() {
-            return new HashSet<>(Lists.newArrayList("dos"));
+            return SCHEME;
         }
 
         public List<String> prepareDownload(String targetPath) {
             List<String> urlList = new ArrayList<>();
-            Optional<ImmutableTriple<String, String, String>> uri = pluginUtil.splitURI(targetPath);
+            Optional<ImmutableTriple<String, String, String>> uri = DOS_PLUGIN_UTIL.splitURI(targetPath);
 
             if (uri.isPresent() && schemesHandled().contains(uri.get().getLeft())) {
-                Optional<JSONObject> jsonObj = pluginUtil.getResponse(uri.get());
+                Optional<JSONObject> jsonObj = DOS_PLUGIN_UTIL.getResponse(uri.get());
 
                 if(jsonObj.isPresent()) {
                     JSONArray urls = jsonObj.get().getJSONObject("data_object").getJSONArray("urls");

@@ -24,7 +24,7 @@ import java.util.Set;
 
 public class DOSPluginUnitTest {
 
-    @Mock (name = "pluginUtil")
+    @Mock (name = "DOS_PLUGIN_UTIL")
     DOSPluginUtil pluginUtil;
     @InjectMocks DOSPlugin.DOSPreProvision dosPreProvision;
 

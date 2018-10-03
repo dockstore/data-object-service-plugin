@@ -2,7 +2,6 @@ package io.dockstore.provision;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.hamcrest.CoreMatchers;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -10,7 +9,6 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.Optional;
 
 
@@ -56,8 +54,13 @@ public class DOSPluginUtilUnitTest {
     @Test
     public void testGetResponse() {
         DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
+        // Construct URL https://dataguids.org/ga4gh/dos/v1/dataobjects/dg.4503/b1266976-fd47-4a32-a7f4-d367d545abb2
         ImmutableTriple<String, String, String> split =
                 new ImmutableTriple<>("dos", "dataguids.org", "dg.4503/b1266976-fd47-4a32-a7f4-d367d545abb2");
+
+        // Create mock valid HttpURLConnection object
+        HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
+        Mockito.doReturn(mockConn).when(spyPluginUtil).createConnection(split);
 
         InputStream expectedResponse = IOUtils.toInputStream(
         "{" +
@@ -88,46 +91,48 @@ public class DOSPluginUtilUnitTest {
         "}");
 
         // Mock downloadJSON() to return (non-empty) InputStream
-        Mockito.doReturn(Optional.of(expectedResponse)).when(spyPluginUtil).downloadJSON(split);
-        Mockito.doNothing().when(spyPluginUtil).disconnect();
+        Mockito.doReturn(Optional.of(expectedResponse)).when(spyPluginUtil).downloadJSON(mockConn);
+        Mockito.doNothing().when(spyPluginUtil).disconnect(mockConn);
 
         Assert.assertTrue(spyPluginUtil.getResponse(split).isPresent());
     }
 
     @Test
-    public void testGetResponseReturnEmpty1() throws IOException {
+    public void testGetResponseReturnEmpty1() {
+        // Test for broken link such that createConnection() returns null
+
         DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
         ImmutableTriple<String, String, String> split =
-                new ImmutableTriple<>("fake-scheme", "fake-host", "fake-path");
+                new ImmutableTriple<>("dos", "dos-dss.ucsc-cgp-dev.org", "fff5a29f-ffffffffff");
 
-        // Create mock HttpURLConnection
-        HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
-        Mockito.when(mockConn.getResponseCode()).thenReturn(500);
-
-        // Return mockConn (with mocked response code) when createConnection() is called
-        Mockito.doReturn(mockConn).when(spyPluginUtil).createConnection("http", split);
+        Mockito.doReturn(null).when(spyPluginUtil).createConnection(split);
         Assert.assertFalse(spyPluginUtil.getResponse(split).isPresent());
     }
 
     @Test
-    public void testGetResponseReturnEmpty2() throws IOException {
+    public void testGetResponseReturnEmpty2() {
+        // Test for null string such that readStream() returns null
+
         DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
         ImmutableTriple<String, String, String> split =
-                new ImmutableTriple<>("fake-scheme", "fake-host", "fake-path");
+                new ImmutableTriple<>("dos", "dos-dss.ucsc-cgp-dev.org", "fff5a29f-ffffffffff");
 
-        // Create mock HttpURLConnection
+        // Create mock HttpURLConnection & InputStream objects
         HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
-        Mockito.when(mockConn.getResponseCode()).thenReturn(500).thenReturn(403);
+        InputStream mockInputStream = Mockito.mock(InputStream.class);
 
-        // Return mockConnection (with mocked response code) when createConnection() is called
-        Mockito.doReturn(mockConn).when(spyPluginUtil).createConnection("http", split);
-        Mockito.doReturn(mockConn).when(spyPluginUtil).createConnection("https", split);
+        // Return mockConn when createConnection() is called
+        Mockito.doReturn(mockConn).when(spyPluginUtil).createConnection(split);
+        // Return null when readStream() is called
+        Mockito.doReturn(null).when(spyPluginUtil).readStream(mockInputStream);
 
         Assert.assertFalse(spyPluginUtil.getResponse(split).isPresent());
     }
 
     @Test
-    public void testGetResponseBadURI() {
+    public void testGetResponseReturnEmpty3() {
+        // Test for invalid URI such that createConnection() returns null
+
         ImmutableTriple<String, String, String> split =
                 new ImmutableTriple<>("fake-scheme", "fake-host", "fake-path");
         Assert.assertFalse(pluginUtil.getResponse(split).isPresent());
@@ -136,60 +141,110 @@ public class DOSPluginUtilUnitTest {
     @Test
     public void testDownloadJSON() throws IOException {
         DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
-        ImmutableTriple<String, String, String> split =
-                new ImmutableTriple<>("dos", "dataguids.org", "dg.4503/630d31c3-381e-488d-b639-ce5d047a0142");
 
-        // Mock createConnection() response with valid mocked InputStream obj
+        // Create mock HttpURLConnection & InputStream objects
         HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
         InputStream mockInputStream = Mockito.mock(InputStream.class);
 
-        // Return valid connection when createConn() is called inside downloadJSON()
-        Mockito.when(mockConn.getResponseCode()).thenReturn(200);
-        Mockito.when(mockConn.getInputStream()).thenReturn(mockInputStream);
-
-        Mockito.doReturn(mockConn).when(spyPluginUtil).createConnection("http", split);
-
-        Assert.assertTrue(spyPluginUtil.downloadJSON(split).isPresent());
+        Mockito.doReturn(mockInputStream).when(mockConn).getInputStream();
+        Assert.assertTrue(spyPluginUtil.downloadJSON(mockConn).isPresent());
     }
 
     @Test
-    public void testDownloadJSONReturnEmpty() throws IOException {
+    public void testDownloadJSONReturnEmpty() {
+        // Test for handling null InputStreams
+
+        DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
+
+        // Create mock HttpURLConnection object with null InputStream
+        HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
+        Assert.assertFalse(spyPluginUtil.downloadJSON(mockConn).isPresent());
+    }
+
+    @Test
+    public void testDownloadJSONReturnEmpty2() throws IOException {
+        // Test for handling IOExceptions
+
+        DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
+
+        // Create mock HttpURLConnection object
+        HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
+
+        Mockito.doThrow(new IOException()).when(mockConn).getInputStream();
+        Assert.assertFalse(spyPluginUtil.downloadJSON(mockConn).isPresent());
+    }
+
+    @Test
+    public void testCreateConnection1() throws IOException {
         DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
         ImmutableTriple<String, String, String> split =
                 new ImmutableTriple<>("dos", "dataguids.org", "dg.4503/630d31c3-381e-488d-b639-ce5d047a0142");
         // Construct URL https://dataguids.org/ga4gh/dos/v1/dataobjects/dg.4503/630d31c3-381e-488d-b639-ce5d047a0142
 
-        // Create mock HttpURLConnection
+        // Create mock URL & HttpURLConnection objects
         HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
-        Mockito.when(mockConn.getResponseCode()).thenReturn(500).thenReturn(403);
+        Mockito.when(mockConn.getResponseCode()).thenReturn(200);
 
-        // Return mockConnection (with mocked response code) when createConnection() is called
-        Mockito.doReturn(mockConn).when(spyPluginUtil).createConnection("http", split);
-        Mockito.doReturn(mockConn).when(spyPluginUtil).createConnection("https", split);
-
-        Assert.assertFalse(spyPluginUtil.downloadJSON(split).isPresent());
-    }
+        Mockito.doReturn(mockConn).when(spyPluginUtil).openURL("http", split);
+        Assert.assertNotNull(spyPluginUtil.createConnection(split));
+   }
 
     @Test
-    public void testCreateConnection() throws IOException {
+    public void testCreateConnection2() throws IOException {
+        DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
         ImmutableTriple<String, String, String> split =
-                new ImmutableTriple<>("dos", "dos-dss.ucsc-cgp-dev.org", "630d31c3-381e-488d-b639-ce5d047a0142?version=2018-05-26T134315.070662Z");
+                new ImmutableTriple<>("dos", "dataguids.org", "dg.4503/630d31c3-381e-488d-b639-ce5d047a0142");
 
-        URL mockURL = new URL("http://" + split.getMiddle() + "/ga4gh/dos/v1/dataobjects/" + split.getRight());
-        HttpURLConnection mockConn = (HttpURLConnection) mockURL.openConnection();
-        Assert.assertThat(mockConn.toString(), CoreMatchers.containsString(pluginUtil.createConnection("http", split).toString()));
+        // Create mock HttpURLConnection objects that fails on http but works for https
+        HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
+        Mockito.when(mockConn.getResponseCode()).thenReturn(500).thenReturn(200);
+
+        Mockito.doReturn(mockConn).when(spyPluginUtil).openURL("http", split);
+        Mockito.doReturn(mockConn).when(spyPluginUtil).openURL("https", split);
+
+        Assert.assertNotNull(spyPluginUtil.createConnection(split));
     }
 
     @Test
-    public void testCreateConnectionReturnNull() {
+    public void testCreateConnectionReturnNull1() {
+        // Test for broken link
+
+        ImmutableTriple<String, String, String> split =
+                new ImmutableTriple<>("dos", "dos-dss.ucsc-cgp-dev.org", "630d31c3ffffffffffffff");
+        Assert.assertNull(pluginUtil.createConnection(split));
+    }
+
+    @Test
+    public void testCreateConnectionReturnNull2() throws IOException {
+        // Test for handling IOExceptions
+
+        DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
         ImmutableTriple<String, String, String> split =
                 new ImmutableTriple<>("fake-scheme", "fake-host", "fake-path");
 
-        Assert.assertNull(pluginUtil.createConnection("fake-protocol", split));
+        // Create mock HttpURLConnection object
+        HttpURLConnection mockConn = Mockito.mock(HttpURLConnection.class);
+
+        Mockito.doThrow(new IOException()).when(mockConn).getResponseCode();
+        Assert.assertNull(spyPluginUtil.createConnection(split));
     }
 
     @Test
-    public void testReadContent() throws IOException {
+    public void testCreateConnectionReturnNull3() {
+        // Test for null HttpURLConnection object such that openURL() returns null
+
+        DOSPluginUtil spyPluginUtil = Mockito.spy(DOSPluginUtil.class);
+        ImmutableTriple<String, String, String> split =
+                new ImmutableTriple<>("fake-scheme", "fake-host", "fake-path");
+
+        Mockito.doReturn(null).when(spyPluginUtil).openURL("http", split);
+        Mockito.doReturn(null).when(spyPluginUtil).openURL("https", split);
+
+        Assert.assertNull(spyPluginUtil.createConnection(split));
+    }
+
+    @Test
+    public void testReadStream() {
         String expectedResponse = "{\"data_object\": {\"checksums\": [{\"checksum\": \"3b0f63a815384a3d44c61b4abd40caf9\", " +
                 "\"type\": \"md5\"}], \"created\": \"2018-05-26T13:43:15.070662\", \"description\": \"\", " +
                 "\"id\": \"dg.4503/630d31c3-381e-488d-b639-ce5d047a0142\", \"mime_type\": \"\", \"name\": null, " +
@@ -226,6 +281,16 @@ public class DOSPluginUtilUnitTest {
                 "}" +
         "}");
 
-        Assert.assertEquals(expectedResponse, pluginUtil.readContent(testInputStream));
+        Assert.assertEquals(expectedResponse, pluginUtil.readStream(testInputStream));
+    }
+
+    @Test
+    public void testReadStreamReturnNull() throws IOException {
+        // Test for handling IOExceptions
+
+        InputStream mockInputStream = Mockito.mock(InputStream.class);
+
+        Mockito.doThrow(new IOException()).when(mockInputStream).read();
+        Assert.assertNull(pluginUtil.readStream(mockInputStream));
     }
 }
