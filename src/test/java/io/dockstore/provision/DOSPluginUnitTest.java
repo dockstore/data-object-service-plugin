@@ -24,8 +24,8 @@ import java.util.Set;
 
 public class DOSPluginUnitTest {
 
-    @Mock (name = "DOS_PLUGIN_UTIL")
-    DOSPluginUtil pluginUtil;
+    @Mock (name = "dosPluginUtil")
+    DOSPluginUtil dosPluginUtil;
     @InjectMocks DOSPlugin.DOSPreProvision dosPreProvision;
 
     @Before
@@ -54,7 +54,7 @@ public class DOSPluginUnitTest {
         expected.add("gs://cgp-commons-multi-region-public/topmed_open_access/53ae11a8-ef4d-5aa6-9227-f372b422f5a1/NWD446684.recab.cram.crai");
         expected.add("s3://cgp-commons-public/topmed_open_access/53ae11a8-ef4d-5aa6-9227-f372b422f5a1/NWD446684.recab.cram.crai");
 
-        InputStream mockStream = IOUtils.toInputStream(
+        InputStream mockInputStream = IOUtils.toInputStream(
         "{" +
                 "\"data_object\": {" +
                         "\"checksums\": [" +
@@ -82,7 +82,7 @@ public class DOSPluginUnitTest {
                 "}" +
         "}");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(mockStream));
+        BufferedReader in = new BufferedReader(new InputStreamReader(mockInputStream));
         String line;
         StringBuilder content = new StringBuilder();
         while ((line = in.readLine()) != null) {
@@ -91,8 +91,8 @@ public class DOSPluginUnitTest {
         JSONObject expectedJSON = new JSONObject(content.toString());
 
         // Mock expected DOSPluginUtil object functionality when splitURI() and getResponse() are called
-        Mockito.when(pluginUtil.splitURI("dos://dg.4503/1aad0eb6-0d89-4fdd-976c-f9aa248fc88c")).thenReturn(java.util.Optional.ofNullable(split));
-        Mockito.when(pluginUtil.getResponse(split)).thenReturn(java.util.Optional.ofNullable(expectedJSON));
+        Mockito.when(dosPluginUtil.splitURI("dos://dg.4503/1aad0eb6-0d89-4fdd-976c-f9aa248fc88c")).thenReturn(java.util.Optional.of(split));
+        Mockito.when(dosPluginUtil.getResponse(split)).thenReturn(java.util.Optional.of(expectedJSON));
 
         List<String> actual = dosPreProvision.prepareDownload("dos://dg.4503/1aad0eb6-0d89-4fdd-976c-f9aa248fc88c");
         Assert.assertEquals(expected, actual);
