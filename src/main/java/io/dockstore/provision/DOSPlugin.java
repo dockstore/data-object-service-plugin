@@ -49,26 +49,28 @@ public class DOSPlugin extends Plugin {
     @Extension
     public static class DOSPreProvision implements PreProvisionInterface {
 
+        DOSPluginUtil dosPluginUtil = new DOSPluginUtil();
+        static final Set<String> SCHEME = new HashSet<>(Lists.newArrayList("dos"));
+
         public Set<String> schemesHandled() {
-            return new HashSet<>(Lists.newArrayList("dos"));
+            return SCHEME;
         }
 
         public List<String> prepareDownload(String targetPath) {
-            DOSPluginUtil pluginUtil = new DOSPluginUtil();
-            List<String> url_list = new ArrayList<>();
-            Optional<ImmutableTriple<String, String, String>> uri = pluginUtil.splitUri(targetPath);
+            List<String> urlList = new ArrayList<>();
+            Optional<ImmutableTriple<String, String, String>> uri = dosPluginUtil.splitURI(targetPath);
 
             if (uri.isPresent() && schemesHandled().contains(uri.get().getLeft())) {
-                Optional<JSONObject> jsonObj = pluginUtil.grabJSON(uri.get());
+                Optional<JSONObject> jsonObj = dosPluginUtil.getResponse(uri.get());
 
                 if(jsonObj.isPresent()) {
                     JSONArray urls = jsonObj.get().getJSONObject("data_object").getJSONArray("urls");
                     for (int i = 0; i < urls.length(); i++) {
-                        url_list.add(urls.getJSONObject(i).getString("url"));
+                        urlList.add(urls.getJSONObject(i).getString("url"));
                     }
                 }
             }
-            return url_list;
+            return urlList;
         }
     }
 }
