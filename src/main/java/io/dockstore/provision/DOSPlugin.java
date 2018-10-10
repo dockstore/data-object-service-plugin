@@ -11,8 +11,11 @@ import ro.fortsoft.pf4j.PluginWrapper;
 import ro.fortsoft.pf4j.RuntimeMode;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
@@ -49,8 +52,21 @@ public class DOSPlugin extends Plugin {
     @Extension
     public static class DOSPreProvision implements PreProvisionInterface {
 
-        DOSPluginUtil dosPluginUtil = new DOSPluginUtil();
         static final Set<String> SCHEME = new HashSet<>(Lists.newArrayList("dos"));
+        public static final String SCHEME_PREFERENCE = "scheme-preference";
+        private Map<String, String> config;
+
+        DOSPluginUtil dosPluginUtil = new DOSPluginUtil();
+        List<String> preferredSchemes = new ArrayList<>();
+
+        @Override
+        public void setConfiguration(Map<String, String> map) {
+            this.config = map;
+
+            if (this.config.containsKey(SCHEME_PREFERENCE)) {
+                this.preferredSchemes = Arrays.asList(this.config.get(SCHEME_PREFERENCE).trim().split(",\\s"));
+            }
+        }
 
         public Set<String> schemesHandled() {
             return SCHEME;
@@ -58,15 +74,35 @@ public class DOSPlugin extends Plugin {
 
         public List<String> prepareDownload(String targetPath) {
             List<String> urlList = new ArrayList<>();
+            Map<String, List<String>> urlMap = new LinkedHashMap<>();
+
             Optional<ImmutableTriple<String, String, String>> uri = dosPluginUtil.splitURI(targetPath);
 
             if (uri.isPresent() && schemesHandled().contains(uri.get().getLeft())) {
+
                 Optional<JSONObject> jsonObj = dosPluginUtil.getResponse(uri.get());
 
                 if(jsonObj.isPresent()) {
                     JSONArray urls = jsonObj.get().getJSONObject("data_object").getJSONArray("urls");
+                    // Place all URLs into map for fast lookup time. URLs with duplicate schemes are appended to existing entry
                     for (int i = 0; i < urls.length(); i++) {
-                        urlList.add(urls.getJSONObject(i).getString("url"));
+                        String url = urls.getJSONObject(i).getString("url");
+                        String scheme = url.split(":\\/\\/(.+)/")[0];
+                        if (urlMap.containsKey(scheme)) {
+                            urlMap.get(scheme).add(url);
+                        } else {
+                            urlMap.put(scheme, new ArrayList<>(Arrays.asList(url)));
+                        }
+                    }
+                    // Append all URLs into urlList in order of preference (if any) and remove added schemes from map to avoid duplication
+                    for (String scheme : preferredSchemes) {
+                        if (urlMap.containsKey(scheme)) {
+                            urlList.addAll(urlMap.get(scheme));
+                            urlMap.remove(scheme);
+                        }
+                    }
+                    for (List<String> remainingSchemes : urlMap.values()) {
+                        urlList.addAll(remainingSchemes);
                     }
                 }
             }
