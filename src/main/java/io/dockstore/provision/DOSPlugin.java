@@ -53,7 +53,8 @@ public class DOSPlugin extends Plugin {
     public static class DOSPreProvision implements PreProvisionInterface {
 
         static final Set<String> SCHEME = new HashSet<>(Lists.newArrayList("dos"));
-        public static final String SCHEME_PREFERENCE = "scheme-preference";
+        static final String SCHEME_PREFERENCE = "scheme-preference";
+        static final int GET_SCHEME = 0;
         private Map<String, String> config;
 
         DOSPluginUtil dosPluginUtil = new DOSPluginUtil();
@@ -75,6 +76,7 @@ public class DOSPlugin extends Plugin {
         public List<String> prepareDownload(String targetPath) {
             List<String> urlList = new ArrayList<>();
             Map<String, List<String>> urlMap = new LinkedHashMap<>();
+            String protocol = ":\\/\\/(.+)/";
 
             Optional<ImmutableTriple<String, String, String>> uri = dosPluginUtil.splitURI(targetPath);
 
@@ -87,7 +89,7 @@ public class DOSPlugin extends Plugin {
                     // Place all URLs into map for fast lookup time. URLs with duplicate schemes are appended to existing entry
                     for (int i = 0; i < urls.length(); i++) {
                         String url = urls.getJSONObject(i).getString("url");
-                        String scheme = url.split(":\\/\\/(.+)/")[0];
+                        String scheme = url.split(protocol)[GET_SCHEME];
                         if (urlMap.containsKey(scheme)) {
                             urlMap.get(scheme).add(url);
                         } else {

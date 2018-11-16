@@ -40,6 +40,15 @@ Provisioning from ./datastore/launcher-2c670320-9ade-4f9d-9e54-3eff66c29e8d/outp
 Downloading: file:///./datastore/launcher-2c670320-9ade-4f9d-9e54-3eff66c29e8d/outputs/md5sum.txt to file:///tmp/md5sum.txt
 ```
 
+### The Config File
+
+```
+[dockstore-file-dos-plugin]
+scheme-preference = s3, gs, synapse
+```
+
+You can also specify an ordering of preferred schemes for any provided DOS URI in your system's `.dockstore/config` file.
+
 ## Releases
 
 This section describes creating a release of the Data Object Service plugin.

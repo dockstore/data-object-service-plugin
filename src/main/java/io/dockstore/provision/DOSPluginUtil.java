@@ -47,8 +47,8 @@ class DOSPluginUtil {
             // or the new format
             // dos://dg.4503/630d31c3-381e-488d-b639-ce5d047a0142
             // See if the Host portion starts with 'dg' and ends with a port number
-            List<String> host_split = Lists.newArrayList(split.get(HOST).split("\\.", 2));
-            if (host_split.size() > 1 && host_split.get(0).equals("dg") && NumberUtils.isNumber(host_split.get(1))) {
+            List<String> hostSplit = Lists.newArrayList(split.get(HOST).split("\\.", 2));
+            if (hostSplit.size() > 1 && hostSplit.get(0).equals("dg") && NumberUtils.isNumber(hostSplit.get(1))) {
                 return Optional.of(new ImmutableTriple<>(split.get(SCHEME), DG_HOST, split.get(DG_PREFIX) + "/" + split.get(DG_UUID)));
             }
             return Optional.of(new ImmutableTriple<>(split.get(SCHEME), split.get(HOST), split.get(PATH)));
@@ -77,8 +77,7 @@ class DOSPluginUtil {
             }
 
         } catch (JSONException e) {
-            System.err.println("getResponse() Error: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("Error: " + e.getMessage());
         } finally {
             disconnect(conn);
         }
@@ -99,9 +98,7 @@ class DOSPluginUtil {
             return validConn;
 
         } catch ( IOException e) {
-            System.err.println("createConnection() Error: " + e.getMessage());
-            e.printStackTrace();
-
+            System.err.println("Error: " + e.getMessage() + ". Returning null");
             return null;
         }
     }
@@ -111,9 +108,7 @@ class DOSPluginUtil {
             URL request = new URL(protocol + "://" + immutableTriple.getMiddle() + API +  immutableTriple.getRight());
             return (HttpURLConnection) request.openConnection();
         } catch (IOException e) {
-            System.err.println("openURL() Error:" + e.getMessage());
-            e.printStackTrace();
-
+            System.err.println("Error:" + e.getMessage() + ". Returning null");
             return null;
         }
     }
@@ -122,7 +117,7 @@ class DOSPluginUtil {
         try {
             return Optional.ofNullable(conn.getInputStream());
         } catch (IOException e) {
-            System.err.println("downloadJSON() Error: " + e.getMessage());
+            System.err.println("Error: " + e.getMessage() + ". Returning empty");
             return Optional.empty();
         }
     }
@@ -137,9 +132,7 @@ class DOSPluginUtil {
             return content.toString();
 
         } catch (IOException e) {
-            System.err.println("readStream() Error: " + e.getMessage());
-            e.printStackTrace();
-
+            System.err.println("Error: " + e.getMessage() + ". Returning null");
             return null;
         }
     }
