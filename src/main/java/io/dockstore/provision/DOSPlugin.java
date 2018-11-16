@@ -81,7 +81,6 @@ public class DOSPlugin extends Plugin {
             Optional<ImmutableTriple<String, String, String>> uri = dosPluginUtil.splitURI(targetPath);
 
             if (uri.isPresent() && schemesHandled().contains(uri.get().getLeft())) {
-
                 Optional<JSONObject> jsonObj = dosPluginUtil.getResponse(uri.get());
 
                 if(jsonObj.isPresent()) {
