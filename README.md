@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/dockstore/data-object-service-plugin.svg?branch=master)](https://travis-ci.org/dockstore/data-object-service-plugin)
-[![Coverage Status](https://coveralls.io/repos/github/dockstore/data-object-service-plugin/badge.svg?branch=master)](https://coveralls.io/github/dockstore/data-object-service-plugin?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/dockstore/data-object-service-plugin/badge.svg?branch=develop)](https://coveralls.io/github/dockstore/data-object-service-plugin?branch=develop)
 
 # data-object-service-plugin
 [Dockstore Data Object Service](https://github.com/ga4gh/data-object-service-schemas) file preprovisioning plugin
@@ -47,7 +47,11 @@ Downloading: file:///./datastore/launcher-2c670320-9ade-4f9d-9e54-3eff66c29e8d/o
 scheme-preference = s3, gs, synapse
 ```
 
-You can also specify an ordering of preferred schemes for any provided DOS URI in your system's `.dockstore/config` file.
+You can optionally specify the order of preferred schemes for DOS URI's in your system's `~/.dockstore/config` file. The scheme precedence is
+ordered from highest (left-most) to lowest (right-most).
+
+Leaving out `scheme-preference` from your system's `~/.dockstore/config` file means that DOS URI's will be resolved by
+calling on the first valid Dockstore plugin locally-installed on your system.
 
 ## Releases
 

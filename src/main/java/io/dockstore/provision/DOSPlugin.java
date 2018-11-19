@@ -65,7 +65,7 @@ public class DOSPlugin extends Plugin {
             this.config = map;
 
             if (this.config.containsKey(SCHEME_PREFERENCE)) {
-                this.preferredSchemes = Arrays.asList(this.config.get(SCHEME_PREFERENCE).trim().split(",\\s"));
+                this.preferredSchemes = Arrays.asList(this.config.get(SCHEME_PREFERENCE).trim().split(",\\s*"));
             }
         }
 
@@ -75,7 +75,7 @@ public class DOSPlugin extends Plugin {
 
         public List<String> prepareDownload(String targetPath) {
             List<String> urlList = new ArrayList<>();
-            Map<String, List<String>> urlMap = new LinkedHashMap<>();
+            Map<String, List<String>> urlMap = new LinkedHashMap<>();       // Linked Hash Maps ensure insertion-ordered key-value pairs
             String protocol = ":\\/\\/(.+)/";
 
             Optional<ImmutableTriple<String, String, String>> uri = dosPluginUtil.splitURI(targetPath);
