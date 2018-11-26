@@ -1,11 +1,5 @@
 package io.dockstore.provision;
 
-import com.google.common.collect.Lists;
-import org.apache.commons.lang3.math.NumberUtils;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +9,12 @@ import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Pattern;
+
+import com.google.common.collect.Lists;
+import org.apache.commons.lang3.math.NumberUtils;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import static java.net.HttpURLConnection.HTTP_OK;
 

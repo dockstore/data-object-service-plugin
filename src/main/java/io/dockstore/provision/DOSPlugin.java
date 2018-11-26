@@ -1,5 +1,14 @@
 package io.dockstore.provision;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
 import com.google.common.collect.Lists;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
@@ -9,15 +18,6 @@ import ro.fortsoft.pf4j.Extension;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
 import ro.fortsoft.pf4j.RuntimeMode;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
 
 
 public class DOSPlugin extends Plugin {
@@ -75,7 +75,10 @@ public class DOSPlugin extends Plugin {
 
         public List<String> prepareDownload(String targetPath) {
             List<String> urlList = new ArrayList<>();
-            Map<String, List<String>> urlMap = new LinkedHashMap<>();       // Linked Hash Maps ensure insertion-ordered key-value pairs
+
+            // Linked Hash Maps ensure insertion-ordered key-value pairs. URLs resolved by the plugin are
+            // inserted by scheme (key) and a list of that scheme's URL(s) (value)
+            Map<String, List<String>> urlMap = new LinkedHashMap<>();
             String protocol = ":\\/\\/(.+)/";
 
             Optional<ImmutableTriple<String, String, String>> uri = dosPluginUtil.splitURI(targetPath);
