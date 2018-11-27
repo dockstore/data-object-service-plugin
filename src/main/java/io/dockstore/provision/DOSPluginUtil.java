@@ -98,7 +98,7 @@ class DOSPluginUtil {
             return validConn;
 
         } catch ( IOException e) {
-            System.err.println("Error: " + e.getMessage() + ". Returning null");
+            System.err.println("Error: " + e.getMessage());
             return null;
         }
     }
@@ -108,7 +108,7 @@ class DOSPluginUtil {
             URL request = new URL(protocol + "://" + immutableTriple.getMiddle() + API +  immutableTriple.getRight());
             return (HttpURLConnection) request.openConnection();
         } catch (IOException e) {
-            System.err.println("Error:" + e.getMessage() + ". Returning null");
+            System.err.println("Error:" + e.getMessage());
             return null;
         }
     }
@@ -117,7 +117,7 @@ class DOSPluginUtil {
         try {
             return Optional.ofNullable(conn.getInputStream());
         } catch (IOException e) {
-            System.err.println("Error: " + e.getMessage() + ". Returning empty");
+            System.err.println("Error: " + e.getMessage());
             return Optional.empty();
         }
     }
@@ -132,7 +132,7 @@ class DOSPluginUtil {
             return content.toString();
 
         } catch (IOException e) {
-            System.err.println("Error: " + e.getMessage() + ". Returning null");
+            System.err.println("Error: " + e.getMessage());
             return null;
         }
     }

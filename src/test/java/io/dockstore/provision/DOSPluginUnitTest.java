@@ -1,16 +1,5 @@
 package io.dockstore.provision;
 
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.tuple.ImmutableTriple;
-import org.json.JSONObject;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -23,6 +12,17 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.tuple.ImmutableTriple;
+import org.json.JSONObject;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.MockitoAnnotations;
 
 
 public class DOSPluginUnitTest {
@@ -43,6 +43,28 @@ public class DOSPluginUnitTest {
         config.put("scheme-preference", "gcs, s3, synapse");
 
         List<String> expectedSchemes = Arrays.asList("gcs", "s3", "synapse");
+        dosPreProvision.setConfiguration(config);
+
+        Assert.assertEquals(expectedSchemes, dosPreProvision.preferredSchemes);
+    }
+
+    @Test
+    public void testSetConfigurationNoSpaces() {
+        Map<String, String> config = new HashMap<>();
+        config.put("scheme-preference", "gcs,s3,synapse");
+
+        List<String> expectedSchemes = Arrays.asList("gcs", "s3", "synapse");
+        dosPreProvision.setConfiguration(config);
+
+        Assert.assertEquals(expectedSchemes, dosPreProvision.preferredSchemes);
+    }
+
+    @Test
+    public void testSetConfigurationVariableSpaces() {
+        Map<String, String> config = new HashMap<>();
+        config.put("scheme-preference", ",gcs,    s3,synapse,    , , foo");
+
+        List<String> expectedSchemes = Arrays.asList("gcs", "s3", "synapse", "foo");
         dosPreProvision.setConfiguration(config);
 
         Assert.assertEquals(expectedSchemes, dosPreProvision.preferredSchemes);

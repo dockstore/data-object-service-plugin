@@ -64,8 +64,12 @@ public class DOSPlugin extends Plugin {
         public void setConfiguration(Map<String, String> map) {
             this.config = map;
 
+            // Parse the preferred schemes into a list by splitting on commas and extra spaces, and remove all empty strings from the list
             if (this.config.containsKey(SCHEME_PREFERENCE)) {
-                this.preferredSchemes = Arrays.asList(this.config.get(SCHEME_PREFERENCE).trim().split(",\\s*"));
+
+                // Arrays.asList returns a fixed-sized array, so wrapping it as an ArrayList object allows list modification
+                this.preferredSchemes = new ArrayList<>(Arrays.asList(this.config.get(SCHEME_PREFERENCE).trim().split(",\\s*")));
+                this.preferredSchemes.removeIf(e -> e.equals(""));
             }
         }
 
