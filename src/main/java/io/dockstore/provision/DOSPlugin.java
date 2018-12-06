@@ -70,8 +70,7 @@ public class DOSPlugin extends Plugin {
             config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
             // Retrieve the scheme preferences from the config file
-            this.preferredSchemes = config.containsKey(SCHEME_PREFERENCE) ?
-                    config.getList(String.class, SCHEME_PREFERENCE) : new ArrayList<>();
+            this.preferredSchemes = config.getList(String.class, SCHEME_PREFERENCE, Collections.emptyList());
             // Remove any empty strings from the list
             this.preferredSchemes.removeIf(e -> e.equals(""));
         }
