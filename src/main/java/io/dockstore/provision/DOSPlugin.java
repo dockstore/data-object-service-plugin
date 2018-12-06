@@ -1,15 +1,20 @@
 package io.dockstore.provision;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.google.common.collect.Lists;
+import org.apache.commons.configuration2.MapConfiguration;
+import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.ImmutableTriple;
 import org.json.JSONArray;
@@ -18,7 +23,6 @@ import ro.fortsoft.pf4j.Extension;
 import ro.fortsoft.pf4j.Plugin;
 import ro.fortsoft.pf4j.PluginWrapper;
 import ro.fortsoft.pf4j.RuntimeMode;
-
 
 public class DOSPlugin extends Plugin {
 
@@ -55,22 +59,21 @@ public class DOSPlugin extends Plugin {
         static final Set<String> SCHEME = new HashSet<>(Lists.newArrayList("dos"));
         static final String SCHEME_PREFERENCE = "scheme-preference";
         static final int GET_SCHEME = 0;
-        private Map<String, String> config;
+        static final String PROTOCOL = ":\\/\\/(.+)/";
 
         DOSPluginUtil dosPluginUtil = new DOSPluginUtil();
         List<String> preferredSchemes = new ArrayList<>();
 
         @Override
         public void setConfiguration(Map<String, String> map) {
-            this.config = map;
+            MapConfiguration config = new MapConfiguration(map);
+            config.setListDelimiterHandler(new DefaultListDelimiterHandler(','));
 
-            // Parse the preferred schemes into a list by splitting on commas and extra spaces, and remove all empty strings from the list
-            if (this.config.containsKey(SCHEME_PREFERENCE)) {
-
-                // Arrays.asList returns a fixed-sized array, so wrapping it as an ArrayList object allows list modification
-                this.preferredSchemes = new ArrayList<>(Arrays.asList(this.config.get(SCHEME_PREFERENCE).trim().split(",\\s*")));
-                this.preferredSchemes.removeIf(e -> e.equals(""));
-            }
+            // Retrieve the scheme preferences from the config file
+            this.preferredSchemes = config.containsKey(SCHEME_PREFERENCE) ?
+                    config.getList(String.class, SCHEME_PREFERENCE) : new ArrayList<>();
+            // Remove any empty strings from the list
+            this.preferredSchemes.removeIf(e -> e.equals(""));
         }
 
         public Set<String> schemesHandled() {
@@ -83,7 +86,6 @@ public class DOSPlugin extends Plugin {
             // Linked Hash Maps ensure insertion-ordered key-value pairs. URLs resolved by the plugin are
             // inserted by scheme (key) and a list of that scheme's URL(s) (value)
             Map<String, List<String>> urlMap = new LinkedHashMap<>();
-            String protocol = ":\\/\\/(.+)/";
 
             Optional<ImmutableTriple<String, String, String>> uri = dosPluginUtil.splitURI(targetPath);
 
@@ -92,25 +94,26 @@ public class DOSPlugin extends Plugin {
 
                 if(jsonObj.isPresent()) {
                     JSONArray urls = jsonObj.get().getJSONObject("data_object").getJSONArray("urls");
-                    // Place all URLs into map for fast lookup time. URLs with duplicate schemes are appended to existing entry
+                    // Place all URLs into map for fast lookup time. URLs with duplicate schemes are merged into the existing list
                     for (int i = 0; i < urls.length(); i++) {
                         String url = urls.getJSONObject(i).getString("url");
-                        String scheme = url.split(protocol)[GET_SCHEME];
-                        if (urlMap.containsKey(scheme)) {
-                            urlMap.get(scheme).add(url);
-                        } else {
-                            urlMap.put(scheme, new ArrayList<>(Arrays.asList(url)));
-                        }
+                        String scheme = url.split(PROTOCOL)[GET_SCHEME];
+
+                        urlMap.merge(scheme, Collections.singletonList(url), (list1, list2) ->
+                           Stream.of(list1, list2)
+                                   .flatMap(Collection::stream)
+                                   .collect(Collectors.toList()));
                     }
+
                     // Append all URLs into urlList in order of preference (if any) and remove added schemes from map to avoid duplication
-                    for (String scheme : preferredSchemes) {
+                    for (String scheme : this.preferredSchemes) {
                         if (urlMap.containsKey(scheme)) {
                             urlList.addAll(urlMap.get(scheme));
                             urlMap.remove(scheme);
                         }
                     }
-                    for (List<String> remainingSchemes : urlMap.values()) {
-                        urlList.addAll(remainingSchemes);
+                    for (List<String> remainder : urlMap.values()) {
+                        urlList.addAll(remainder);
                     }
                 }
             }

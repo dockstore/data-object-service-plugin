@@ -71,6 +71,16 @@ public class DOSPluginUnitTest {
     }
 
     @Test
+    public void testSetConfigurationNoPreferences() {
+        Map<String, String> config = new HashMap<>();
+
+        List<String> expectedSchemes = new ArrayList<>();
+        dosPreProvision.setConfiguration(config);
+
+        Assert.assertEquals(expectedSchemes, dosPreProvision.preferredSchemes);
+    }
+
+    @Test
     public void testSchemesHandled() {
         Set<String> scheme = new HashSet<>(Collections.singletonList("dos"));
         Assert.assertEquals(scheme, dosPreProvision.schemesHandled());
@@ -207,8 +217,8 @@ public class DOSPluginUnitTest {
                 new ImmutableTriple<>("dos", "dataguids.org", "dg.4503/1aad0eb6-0d89-4fdd-976c-f9aa248fc88c");
 
         List<String> expected = new ArrayList<>();
-        expected.add("gs://gs-url-1/path");
-        expected.add("gs://gs-url-2/path");
+        expected.add("gs://gs-url/path1");
+        expected.add("gs://gs-url/path2");
         expected.add("s3://s3-url/path");
 
         InputStream mockInputStream = IOUtils.toInputStream(
@@ -229,13 +239,13 @@ public class DOSPluginUnitTest {
                 "\"updated\": \"2018-05-26T13:43:17.056871\"," +
                 "\"urls\": [" +
                     "{" +
-                        "\"url\": \"gs://gs-url-1/path\"" +
+                        "\"url\": \"gs://gs-url/path1\"" +
                     "}," +
                     "{" +
                         "\"url\": \"s3://s3-url/path\"" +
                     "}," +
                     "{" +
-                        "\"url\": \"gs://gs-url-2/path\"" +
+                        "\"url\": \"gs://gs-url/path2\"" +
                     "}" +
                 "]," +
                 "\"version\": \"89dfdc16\"" +
