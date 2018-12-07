@@ -1,6 +1,9 @@
 package io.dockstore.provision;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -12,7 +15,6 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import com.google.common.collect.Lists;
 import org.apache.commons.configuration2.MapConfiguration;
 import org.apache.commons.configuration2.convert.DefaultListDelimiterHandler;
 import org.apache.commons.lang3.StringUtils;
@@ -56,10 +58,8 @@ public class DOSPlugin extends Plugin {
     @Extension
     public static class DOSPreProvision implements PreProvisionInterface {
 
-        static final Set<String> SCHEME = new HashSet<>(Lists.newArrayList("dos"));
+        static final Set<String> SCHEME = new HashSet<>(Arrays.asList("dos"));
         static final String SCHEME_PREFERENCE = "scheme-preference";
-        static final int GET_SCHEME = 0;
-        static final String PROTOCOL = ":\\/\\/(.+)/";
 
         DOSPluginUtil dosPluginUtil = new DOSPluginUtil();
         List<String> preferredSchemes = new ArrayList<>();
@@ -86,24 +86,28 @@ public class DOSPlugin extends Plugin {
             // inserted by scheme (key) and a list of that scheme's URL(s) (value)
             Map<String, List<String>> urlMap = new LinkedHashMap<>();
 
-            Optional<ImmutableTriple<String, String, String>> uri = dosPluginUtil.splitURI(targetPath);
+            Optional<ImmutableTriple<String, String, String>> dosUri = dosPluginUtil.splitURI(targetPath);
 
-            if (uri.isPresent() && schemesHandled().contains(uri.get().getLeft())) {
-                Optional<JSONObject> jsonObj = dosPluginUtil.getResponse(uri.get());
+            if (dosUri.isPresent() && schemesHandled().contains(dosUri.get().getLeft())) {
+                Optional<JSONObject> response = dosPluginUtil.getResponse(dosUri.get());
+                if(response.isPresent()) {
+                    JSONArray retrievedUrls = response.get().getJSONObject("data_object").getJSONArray("urls");
 
-                if(jsonObj.isPresent()) {
-                    JSONArray urls = jsonObj.get().getJSONObject("data_object").getJSONArray("urls");
                     // Place all URLs into map for fast lookup time. URLs with duplicate schemes are merged into the existing list
-                    for (int i = 0; i < urls.length(); i++) {
-                        String url = urls.getJSONObject(i).getString("url");
-                        String scheme = url.split(PROTOCOL)[GET_SCHEME];
+                    for (int i = 0; i < retrievedUrls.length(); i++) {
+                        try {
+                            URI uri = new URI(retrievedUrls.getJSONObject(i).getString("url"));
+                            String scheme = uri.getScheme();
 
-                        urlMap.merge(scheme, Collections.singletonList(url), (list1, list2) ->
-                           Stream.of(list1, list2)
-                                   .flatMap(Collection::stream)
-                                   .collect(Collectors.toList()));
+                            // Merge the new URI to the list associated with the current scheme
+                            urlMap.merge(scheme, Collections.singletonList(uri.toString()), (list1, list2) ->
+                                    Stream.of(list1, list2)
+                                            .flatMap(Collection::stream)
+                                            .collect(Collectors.toList()));
+                        } catch (URISyntaxException e) {
+                            continue;
+                        }
                     }
-
                     // Append all URLs into urlList in order of preference (if any) and remove added schemes from map to avoid duplication
                     for (String scheme : this.preferredSchemes) {
                         if (urlMap.containsKey(scheme)) {

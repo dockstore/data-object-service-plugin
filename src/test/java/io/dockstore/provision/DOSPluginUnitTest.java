@@ -135,6 +135,8 @@ public class DOSPluginUnitTest {
         while ((line = in.readLine()) != null) {
             content.append(line);
         }
+        in.close();
+
         JSONObject expectedJSON = new JSONObject(content.toString());
 
         // Mock expected DOSPluginUtil object functionality when splitURI() and getResponse() are called
@@ -198,6 +200,7 @@ public class DOSPluginUnitTest {
         while ((line = in.readLine()) != null) {
             content.append(line);
         }
+        in.close();
 
         JSONObject expectedJSON = new JSONObject(content.toString());
 
@@ -258,6 +261,7 @@ public class DOSPluginUnitTest {
         while ((line = in.readLine()) != null) {
             content.append(line);
         }
+        in.close();
 
         JSONObject expectedJSON = new JSONObject(content.toString());
 
