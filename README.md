@@ -1,5 +1,5 @@
 [![Build Status](https://travis-ci.org/dockstore/data-object-service-plugin.svg?branch=master)](https://travis-ci.org/dockstore/data-object-service-plugin)
-[![Coverage Status](https://coveralls.io/repos/github/dockstore/data-object-service-plugin/badge.svg?branch=master)](https://coveralls.io/github/dockstore/data-object-service-plugin?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/dockstore/data-object-service-plugin/badge.svg?branch=develop)](https://coveralls.io/github/dockstore/data-object-service-plugin?branch=develop)
 
 # data-object-service-plugin
 [Dockstore Data Object Service](https://github.com/ga4gh/data-object-service-schemas) file preprovisioning plugin
@@ -40,13 +40,33 @@ Provisioning from ./datastore/launcher-2c670320-9ade-4f9d-9e54-3eff66c29e8d/outp
 Downloading: file:///./datastore/launcher-2c670320-9ade-4f9d-9e54-3eff66c29e8d/outputs/md5sum.txt to file:///tmp/md5sum.txt
 ```
 
+### The Config File
+
+```
+[dockstore-file-dos-plugin]
+scheme-preference = s3, gs, synapse
+```
+
+A basic Dockstore configuration file is available/should be created in `~/.dockstore/config`.
+By default, Dockstore attempts to download the first URL whose scheme is supported by one of your locally-installed Dockstore
+file provisioning plugins.
+
+You can override the default behavior by configuring the Data-Object-Service plugin with the `scheme-preference` option.
+`scheme-preference` lets you specify your preferred order of schemes that the Data Object Service plugin will use to order the
+resolved data objects from a provided DOS URI.
+
+Dockstore will attempt to download the first URL from the ordered list whose scheme is supported by one of your
+locally-installed Dockstore file provisioning plugins.
+
+Omitting `scheme-preference` from `~/.dockstore/config` returns Dockstore to the default behavior for resolving DOS URIs, as described above.
+
 ## Releases
 
 This section describes creating a release of the Data Object Service plugin.
 
 ### Prerequisites
 
-[Install](https://datasift.github.io/gitflow/TheHubFlowTools.html) Hubflow. After it is installed, run `git hubflow init` in the 
+[Install](https://datasift.github.io/gitflow/TheHubFlowTools.html) Hubflow. After it is installed, run `git hubflow init` in the
 root of your copy of the repo.
 
 ### Create the Release
@@ -78,14 +98,14 @@ Then do `git hf release finish 0.0.4`, which will
 
 1. In your browser, go to https://github.com/dockstore/data-object-service-plugin/releases
 2. You will see `0.0.4` listed, but it is *not* a GitHub release, it is a only tag. All GitHub releases have Git tags, but not all Git tags
-are  GitHub releases, even though the GitHub UI Releases tab doesn't clearly make that distinction. See 
+are  GitHub releases, even though the GitHub UI Releases tab doesn't clearly make that distinction. See
  [this issue](https://github.com/bcit-ci/CodeIgniter/issues/3421).
 3. Create a GitHub 0.0.4 release
     1. Click `Draft (or Create) a new release`.
     2. Specify the tag, `0.0.4`
-    3. Attach the zip file from your local target directory, which will have the version number in it, e.g., 
+    3. Attach the zip file from your local target directory, which will have the version number in it, e.g.,
     dockstore-file-dos-plugin-0.0.4.zip, to the binaries section of the page.
     4. Enter a title and a description.
     5. Click `Publish Release`
-    
- 
+
+
