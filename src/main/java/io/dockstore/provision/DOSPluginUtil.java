@@ -53,7 +53,7 @@ class DOSPluginUtil {
             // dos://dos-dss.ucsc-cgp-dev.org/630d31c3-381e-488d-b639-ce5d047a0142?version=2018-05-26T134315.070662Z
             // or the new format
             // dos://dg.4503/630d31c3-381e-488d-b639-ce5d047a0142
-            // See if the Host portion starts with 'dg.<port>', 'dos' otherwise
+            // See if the Host portion starts with 'dg.<number>', 'dos' otherwise
             if (uri.getAuthority().startsWith("dg.")) {
                 return Optional.of(new ImmutableTriple<>(uri.getScheme(), DG_HOST, uri.getAuthority() + fullPath));
             } else if (!uri.getPath().equals("")) {

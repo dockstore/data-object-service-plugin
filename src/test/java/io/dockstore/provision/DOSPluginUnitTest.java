@@ -129,13 +129,14 @@ public class DOSPluginUnitTest {
             "}" +
         "}");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(mockInputStream));
         String line;
         StringBuilder content = new StringBuilder();
-        while ((line = in.readLine()) != null) {
-            content.append(line);
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(mockInputStream))) {
+            while ((line = in.readLine()) != null) {
+                content.append(line);
+            }
         }
-        in.close();
 
         JSONObject expectedJSON = new JSONObject(content.toString());
 
@@ -194,13 +195,14 @@ public class DOSPluginUnitTest {
             "}" +
         "}");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(mockInputStream));
         String line;
         StringBuilder content = new StringBuilder();
-        while ((line = in.readLine()) != null) {
-            content.append(line);
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(mockInputStream))) {
+            while ((line = in.readLine()) != null) {
+                content.append(line);
+            }
         }
-        in.close();
 
         JSONObject expectedJSON = new JSONObject(content.toString());
 
@@ -255,13 +257,14 @@ public class DOSPluginUnitTest {
             "}" +
         "}");
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(mockInputStream));
         String line;
         StringBuilder content = new StringBuilder();
-        while ((line = in.readLine()) != null) {
-            content.append(line);
+
+        try (BufferedReader in = new BufferedReader(new InputStreamReader(mockInputStream))) {
+            while ((line = in.readLine()) != null) {
+                content.append(line);
+            }
         }
-        in.close();
 
         JSONObject expectedJSON = new JSONObject(content.toString());
 
